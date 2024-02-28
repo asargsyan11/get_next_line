@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   get_next_line_bonus.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: asargsya <asargsya@student.42yerevan.am>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/02/16 09:38:22 by asargsya          #+#    #+#             */
-/*   Updated: 2024/02/27 10:37:31 by asargsya         ###   ########.fr       */
+/*   Created: 2024/02/27 10:58:37 by asargsya          #+#    #+#             */
+/*   Updated: 2024/02/28 12:10:51 by asargsya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
 int	null_check(char *str)
 {
@@ -75,28 +75,28 @@ char	*ft_get_whats_left(char *str)
 
 char	*get_next_line(int fd)
 {
-	static char	*current_line;
+	static char	*current_line[OPEN_MAX];
 	char		*line_to_read;
 	int			index;
 
 	line_to_read = NULL;
 	index = 0;
-	if (fd < 0 || BUFFER_SIZE <= 0 || read(fd, 0, 0) < 0)
+	if (fd < 0 || BUFFER_SIZE <= 0 || fd > OPEN_MAX || read(fd, 0, 0) < 0)
 	{
-		free(current_line);
-		current_line = NULL;
+		free(current_line[fd]);
+		current_line[fd] = NULL;
 		return (NULL);
 	}
-	current_line = ft_read_a_little(fd, current_line);
-	null_check(current_line);
-	if (*current_line)
+	current_line[fd] = ft_read_a_little(fd, current_line[fd]);
+	null_check(current_line[fd]);
+	if (*current_line[fd])
 	{
-		while (current_line[index] && current_line[index] != '\n')
+		while (current_line[fd][index] && current_line[fd][index] != '\n')
 			index++;
 		line_to_read = malloc(sizeof(char) * (index + 2));
 		null_check(line_to_read);
-		line_to_read = ft_strcpy(line_to_read, current_line);
+		line_to_read = ft_strcpy(line_to_read, current_line[fd]);
 	}
-	current_line = ft_get_whats_left(current_line);
+	current_line[fd] = ft_get_whats_left(current_line[fd]);
 	return (line_to_read);
 }
